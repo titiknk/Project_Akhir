@@ -1,17 +1,34 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
+import LoginForm from './components/LoginForm';
 import HomeScreen from './screen/HomeScreen';
 
-const Stack = createNativeStackNavigator();
-
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = (email, password) => {
+    // Silakan gunakan API atau penyimpanan data yang aman untuk validasi login
+    if (email === "admin@gmail.com" && password === "admin123") {
+      setIsLoggedIn(true);
+    }
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      {isLoggedIn ? <HomeScreen /> : <LoginForm onLogin={handleLogin} />}
+    </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default App;
