@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import LoginForm from './components/LoginForm';
 import HomeScreen from './screen/HomeScreen';
+import HomeScreen from './screen/Menu';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
