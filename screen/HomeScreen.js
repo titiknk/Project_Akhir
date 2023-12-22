@@ -1,15 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, FlatList, SafeAreaView, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Text, View } from "react-native";
-import React, {useEffect, useState} from "react";
+import { ActivityIndicator, FlatList, Pressable, SafeAreaView, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Text, View } from "react-native";
+import {useEffect, useState} from "react";
 
-
-const Item = ({name}) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{name}</Text>
-  </View>
+const Item = ({name, onPress}) => (
+  <TouchableOpacity style={styles.item} onPress={onPress}>
+  <Text style={styles.title}>{name}</Text>
+  </TouchableOpacity>
 );
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -29,6 +28,10 @@ const HomeScreen = () => {
     getDatas();
   }, []);
 
+  const openDetail = (id) => {
+    navigation.navigate('ItemDetailScreen', { itemId: id})
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {isLoading ? (
@@ -36,7 +39,7 @@ const HomeScreen = () => {
       ) : (
         <FlatList
           data={data}
-          renderItem={({item}) => <Item name={item.name} />}
+          renderItem={({item}) => <Item name={item.name} onPress={() => openDetail(item.id)}/>}
           keyExtractor={item => item.id}
         />
       )}
