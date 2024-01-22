@@ -13,6 +13,7 @@ const HomeScreen = ({navigation}) => {
   const [data, setData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [inputId] = useState('');
   const [inputName, setInputName] = useState('');
   const [search, setSearch] = useState('');
 
@@ -33,8 +34,10 @@ const HomeScreen = ({navigation}) => {
     getDatas();
   }, []);
 
-  const openDetail = (id) => {
-    navigation.navigate('ItemDetailScreen', { itemId: id})
+  const openDetail = (id, name) => {
+    setInputId(id)
+    setInputName(name)
+    setModalVisible(true)
   }
 
   const addData = () => {
@@ -42,8 +45,9 @@ const HomeScreen = ({navigation}) => {
   }
 
   const saveData = async () => {
+    if (inputId == '') {
     try{
-      const payload ={
+      const payload = {
         name: inputName,
         data: {
           id: 1,
@@ -63,8 +67,55 @@ const HomeScreen = ({navigation}) => {
       console.error(error);
     } finally {
       setModalVisible(false)
+      getDatas()
+    }
+  } else {
+    try {
+      const payload = {
+        name: inputName,
+        data: {
+          id: 1,
+          name: pasel,
+      }
+      }
+      const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json' + inputId, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+      const json = await response.json();
+      console.log(json);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setModalVisible(false)
+      getDatas()
     }
   }
+}
+
+const removeData = async () => {
+  try {
+    const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json' + inputId, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'DELETE',
+    });
+    const json = await response.json();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setModalVisible(false)
+    getDatas()
+  }
+}
+
+const closeModal = () => {
+  setModalVisible(false);
+}
 
   const searchData = async (input) => {
     setSearch(input)
@@ -78,17 +129,17 @@ const HomeScreen = ({navigation}) => {
       </TouchableOpacity>
 
       <TextInput 
-      style={styles.input}
-      onChangeText={searchData}
-      value={search}
-      placeholder="Search..."/>
+        style={styles.input}
+        onChangeText={searchData}
+        value={search}
+        placeholder="Search..."/>
 
       {isLoading ? (
         <ActivityIndicator style={styles.container}/>
       ) : (
         <FlatList
           data={data}
-          renderItem={({item}) => <Item name={item.name} onPress={() => openDetail(item.id)}/>}
+          renderItem={({item}) => <Item name={item.name} onPress={() => openDetail(item.id, item.name)} />}
           keyExtractor={item => item.id}
         />
       )}
@@ -114,6 +165,17 @@ const HomeScreen = ({navigation}) => {
               <Text style={styles.textStyle}>Save</Text>
 
             </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => removeData()}>
+              <Text style={styles.textStyle}>Hapus</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => closeModal()}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+
           </View>
         </View>
       </Modal>
